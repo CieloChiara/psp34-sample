@@ -7,7 +7,7 @@ const Header = (): JSX.Element => {
   const { theme, setTheme } = useTheme();
 
   const [mounted, setMounted] = useState(false);
-useEffect(() => setMounted(true), []);
+  useEffect(() => setMounted(true), []);
 
   return (
     <header className="mx-auto max-w-6xl w-11/12">
@@ -30,9 +30,9 @@ useEffect(() => setMounted(true), []);
             {mounted && (
               <>
                 {theme === 'dark' ? (
-                  <span>DarkMode</span>
+                  <div className='h-8 pt-3'><img className="h-8" src="/icon_sun.svg" alt="loading" /></div>
                 ) : (
-                  <span>LightMode</span>
+                  <div className='h-8 pt-3'><img className="h-7" src="/icon_moon.svg" alt="loading" /></div>
                 )}
               </>
             )}
