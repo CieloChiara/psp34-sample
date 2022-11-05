@@ -3,6 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   assetPrefix: "/minter",
+  trailingSlash: true,
   async rewrites() {
     return [
       {

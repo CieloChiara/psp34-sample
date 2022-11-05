@@ -300,8 +300,8 @@ const IndexCanvas = () => {
             <div className='h-64 flex justify-center items-center'>
               {tokenURI ? ipfsImageURI ?
                 <img className="p-2 m-auto h-64 duration-300" src={ipfsImageURI} /> :
-                <img className="h-32 duration-300" src="/loading_default.svg" /> :
-                <img className="h-32 duration-300" src="/image-placeholder.png" />
+                <img className="h-32 duration-300" src="./loading_default.svg" /> :
+                <img className="h-32 duration-300" src="./image-placeholder.png" />
               }
             </div>
             <p className="p-1 m-1 text-xl break-words">{tokenName}</p>

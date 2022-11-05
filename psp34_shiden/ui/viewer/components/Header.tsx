@@ -30,9 +30,9 @@ const Header = (): JSX.Element => {
             {mounted && (
               <>
                 {theme === 'dark' ? (
-                  <div className='h-8 pt-3'><img className="h-8" src="/icon_sun.svg" alt="loading" /></div>
+                  <div className='h-8 pt-3'><img className="h-8" src="./icon_sun.svg" alt="DarkMode" /></div>
                 ) : (
-                  <div className='h-8 pt-3'><img className="h-7" src="/icon_moon.svg" alt="loading" /></div>
+                  <div className='h-8 pt-3'><img className="h-7" src="./icon_moon.svg" alt="LightMode" /></div>
                 )}
               </>
             )}
