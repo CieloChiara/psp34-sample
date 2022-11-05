@@ -7,7 +7,7 @@ const SampleContractsList = (): JSX.Element => {
       { name: 'PSP34Sample', address: 'none' },
     ],
     shibuya: [
-      { name: 'PSP34Sample', address: 'ZfE77wpD3PCruzJP1xQXRo8YVaQgT3XYxpvkCwVvtnoueKy' },
+      { name: 'PSP34Sample', address: 'YSXjTTTiqYuUQT51WgMCQspKsw7qiY4Ng2Crp3Mc2hNmATc' },
     ],
   };
 

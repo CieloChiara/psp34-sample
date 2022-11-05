@@ -98,13 +98,15 @@ const IndexCanvas = () => {
       return;
     }
     const gasLimit = 30000 * 1000000;
-    const value = 1000000000000000; //new BN(1);
+    const value = new BN(10).pow(new BN(18));
+    //dm = new BN(balance).divmod(base);
+    //return parseFloat(dm.div.toString() + "." + dm.mod.toString())
 
     const contract = new ContractPromise(api, abi, contractAddress);
     const account = accounts.filter(data => data.address === actingAddress);
 
     const mintTokenExtrinsic =
-      await contract.tx['psp34Custom::mintNext']({value: value, gasLimit: gasLimit});
+      await contract.tx['shiden34Trait::mintNext']({value: value, gasLimit: gasLimit});
 
     let injector: any;
     if (accounts.length == 1) {
@@ -144,7 +146,7 @@ const IndexCanvas = () => {
 
     const contract = new ContractPromise(api, abi, contractAddress);
     const {result, output} = 
-      await contract.query['psp34Custom::tokenUri'](
+      await contract.query['shiden34Trait::tokenUri'](
         contractAddress,
         {value: 0, gasLimit: -1},
         {u64: tokenId});
@@ -376,7 +378,7 @@ const IndexCanvas = () => {
             className="p-2 m-2 bg-[#dcd6c8] dark:bg-[#020913] border-2 border-[#95928b] dark:border-gray-500 rounded"
             onChange={(event) => setContractAddress(event.target.value)}
             placeholder="ContractAddress"
-          /> (Mint cost: 0.001)
+          /> (Mint cost: 1.00)
           <p className="p-1 m-1 break-all">Status: {gasConsumed}</p>
         </div>
       </div>

@@ -81,7 +81,7 @@ const IndexCanvas = () => {
 
     const contract = new ContractPromise(api, abi, contractAddress);
     const {result, output} = 
-      await contract.query['psp34Custom::tokenUri'](
+      await contract.query['shiden34Trait::tokenUri'](
         contractAddress,
         {value: 0, gasLimit: -1},
         {u64: tokenId});
