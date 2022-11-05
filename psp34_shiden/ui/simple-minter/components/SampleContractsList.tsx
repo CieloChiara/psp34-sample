@@ -60,7 +60,7 @@ const SampleContractsList = (): JSX.Element => {
         <dt className="m-1 text-xl">Custom</dt>
         <dd className="ml-4">
         <input
-            className="w-[95%] max-w-[500px] p-2 m-2 bg-[#dcd6c8] dark:bg-[#020913] border-2 border-[#95928b] dark:border-gray-500 rounded"
+            className="w-[95%] max-w-[500px] w-20 p-2 m-2 bg-[#dcd6c8] dark:bg-[#020913] border-2 border-[#95928b] dark:border-gray-500 rounded"
             onChange={(event) => saveCustomContract(event.target.value)}
             placeholder="Custom contract address here"
             value={customContract}

@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
+import BN from 'bn.js';
 import { ApiPromise, WsProvider } from '@polkadot/api';
+import type { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { ContractPromise } from '@polkadot/api-contract';
+import { web3FromSource } from '@polkadot/extension-dapp';
+
 import axios from 'axios';
 import Header from './Header';
 import Footer from './Footer';
@@ -29,7 +33,6 @@ const IndexCanvas = () => {
     {
       name: 'Custom',
       url: '',
-      //url: 'wss://astar-collator.cielo.works:11443',
     },
   ];
 
@@ -40,6 +43,8 @@ const IndexCanvas = () => {
   const [actingChainUrl, setActingChainUrl] = useState('');
   const [customUrl, setCustomUrl] = useState('');
 
+  const [accounts, setAccounts] = useState<InjectedAccountWithMeta[]>([]);
+  const [actingAddress, setActingAddress] = useState("");
   const [api, setApi] = useState<any>();
   
   const [contractAddress, setContractAddress] = useState('');
@@ -48,6 +53,7 @@ const IndexCanvas = () => {
   const [ownerAddress, setOwnerAddress] = useState('');
   
   const [result, setResult] = useState('');
+  const [gasConsumed, setGasConsumed] = useState("");
   const [outcome, setOutcome] = useState('');
   
   const [tokenImageURI, setTokenImageURI] = useState('');
@@ -66,11 +72,68 @@ const IndexCanvas = () => {
     setCustomUrl(url);
   },[]);
 
-  async function getTokenURI() {
+  
+  const extensionSetup = async () => {
     if (!blockchainUrl || !block) {
-      alert('Please select Blockchain and click "Set Blockchain" button.');
+      alert("Please select Blockchain and click 'Set Blockchain' button.");
       return;
     }
+    const { web3Accounts, web3Enable } = await import(
+      "@polkadot/extension-dapp"
+    );
+    const extensions = await web3Enable("Showcase PSP34 Mint Sample");
+    if (extensions.length === 0) {
+      return;
+    }
+    const account = await web3Accounts();
+    setAccounts(account);
+    if (!actingAddress) {
+      setActingAddress(account[0].address);
+    }
+  };
+
+  async function execMint() {
+    if (!blockchainUrl || !block || accounts.length == 0) {
+      alert("Please select Blockchain and click 'Set Blockchain' button and click 'Set Account' button.");
+      return;
+    }
+    const gasLimit = 30000 * 1000000;
+    const value = 1000000000000000; //new BN(1);
+
+    const contract = new ContractPromise(api, abi, contractAddress);
+    const account = accounts.filter(data => data.address === actingAddress);
+
+    const mintTokenExtrinsic =
+      await contract.tx['psp34Custom::mintNext']({value: value, gasLimit: gasLimit});
+
+    let injector: any;
+    if (accounts.length == 1) {
+      injector = await web3FromSource(accounts[0].meta.source);
+    } else if (accounts.length > 1) {
+      injector = await web3FromSource(account[0].meta.source);
+    } else {
+      return;
+    }
+
+    mintTokenExtrinsic.signAndSend(actingAddress, { signer: injector.signer }, ({ status }) => {
+      if (status.isInBlock) {
+        console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+        setGasConsumed("Completed at block hash #" + status.asInBlock.toString());
+      } else if (status.isFinalized) {
+        console.log('finalized');
+        setGasConsumed("finalized");
+      } else {
+        console.log(`Current status: ${status.type}`);
+        setGasConsumed("Current status: " + status.type.toString());
+      }
+    }).catch((error: any) => {
+      console.log(':( transaction failed', error);
+      setGasConsumed(":( transaction failed: " + error.toString());
+    });
+
+  };
+
+  async function getTokenURI() {
 
     setTokenURI('');
     setTokenImageURI('');
@@ -274,6 +337,48 @@ const IndexCanvas = () => {
         : <></> }
         <div className="m-2">Current BlockchainName: {actingChainName? actingChainName : "---"}</div>
         <div className="m-2">URL: {actingChainUrl? actingChainUrl : "---"}</div>
+      </div>
+
+      <div className="text-left p-2 pt-0 mt-5 m-auto max-w-6xl w-11/12 border-[#d8d2c5] dark:border-[#323943] bg-[#f4efe2] dark:bg-[#121923] border border-1 rounded">
+        <div className="text-center mt-4">
+          <div className="mb-2 text-xl">Connect wallet</div>
+          <button
+              className="bg-[#184e9b] hover:bg-[#2974df] hover:duration-500 disabled:bg-[#a4a095] dark:disabled:bg-stone-700 text-white rounded px-4 py-2"
+              onClick={extensionSetup}
+            >
+              Set Account
+          </button>
+          <select
+          className="p-3 m-3 mt-0 bg-[#dcd6c8] dark:bg-[#020913] border-2 border-[#95928b] dark:border-gray-500 dark:border-gray-300 rounded"
+            onChange={(event) => {
+              console.log(event);
+              setActingAddress(event.target.value);
+            }}
+          >
+            {accounts.map((a) => (
+              <option key={a.address} value={a.address}>
+                [{a.meta.name}]
+              </option>
+            ))}
+          </select>
+          <p className="p-1 m-1 break-all">actingAddress: {actingAddress}</p>
+        </div>
+      </div>
+
+      <div className="text-left p-2 pt-0 mt-5 m-auto max-w-6xl w-11/12 border-[#d8d2c5] dark:border-[#323943] bg-[#f4efe2] dark:bg-[#121923] border border-1 rounded">
+        <div className="text-center mt-4">
+          <div className="mb-2 text-xl">Mint NFT</div>
+          <button disabled={!contractAddress}
+            className="bg-[#184e9b] hover:bg-[#2974df] hover:duration-500 disabled:bg-[#a4a095] dark:disabled:bg-stone-700 text-white rounded px-4 py-2"
+            onClick={execMint}
+          >{contractAddress ? 'Mint NFT' : 'Enter ContractAddress'}</button>
+          <input
+            className="p-2 m-2 bg-[#dcd6c8] dark:bg-[#020913] border-2 border-[#95928b] dark:border-gray-500 rounded"
+            onChange={(event) => setContractAddress(event.target.value)}
+            placeholder="ContractAddress"
+          /> (Mint cost: 0.001)
+          <p className="p-1 m-1 break-all">Status: {gasConsumed}</p>
+        </div>
       </div>
 
       <div className="text-left p-2 pt-0 mt-5 m-auto max-w-6xl w-11/12 border-[#d8d2c5] dark:border-[#323943] bg-[#f4efe2] dark:bg-[#121923] border border-1 rounded">
