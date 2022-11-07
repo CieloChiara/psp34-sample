@@ -2,8 +2,5 @@ Rebase TEST
 Add text @ develop
 Add text @ develop 2
 Add text @ develop 3
-<<<<<<< HEAD
 Add text @ develop 4
 Add text @ develop 5
-=======
->>>>>>> Update test.txt
