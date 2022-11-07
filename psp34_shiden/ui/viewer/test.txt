@@ -1,1 +1,2 @@
 Rebase TEST
+Add text from remote @ feature/rebase_test
